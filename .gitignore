@@ -1,0 +1,21 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Impeccable files and artifacts
+PRODUCT.md
+DESIGN.md
+.impeccable/
+.agent/
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Logs & temp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
