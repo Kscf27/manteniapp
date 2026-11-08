@@ -44,17 +44,10 @@ Abre en tu navegador:
 
 ---
 
-## 📬 Configuración de Correo (.env)
+## 📬 Flujo de Envío de la Demo por Correo
 
-El archivo `.env` ya se encuentra configurado con tus credenciales SMTP:
-
-```env
-PORT=3001
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=465
-EMAIL_SECURE=true
-EMAIL_USER=entregaservicio53@gmail.com
-EMAIL_PASS=hlomtkftujllvazu
-```
-
-Cada vez que un cliente complete el formulario, recibirás una notificación instantánea en `entregaservicio53@gmail.com` con el nombre, empresa, correo y teléfono del contacto.
+1. El usuario completa sus datos (Nombre, Empresa, Correo, Teléfono) y presiona **"Quiero mi Demo"**.
+2. El backend procesa la petición y envía un correo interactivo directamente al **correo del usuario**.
+3. El correo recibido contiene una plantilla diseñada para **ManteniApp**, con un botón principal que redirige a la aplicación en vivo desplegada en Vercel:
+   👉 **https://manteniapp.vercel.app/**
+4. Se envía una copia oculta (BCC) a `entregaservicio53@gmail.com` para registro del proyecto.

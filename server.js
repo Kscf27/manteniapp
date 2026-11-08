@@ -60,61 +60,124 @@ app.post('/api/solicitar-demo', async (req, res) => {
 
     const transporter = createTransporter();
 
-    // Contenido del correo en formato HTML elegante
+    // Enlace de la demo interactiva en Vercel
+    const demoUrl = 'https://manteniapp.vercel.app/';
+
+    // Contenido del correo que se envía al usuario solicitante
     const mailOptions = {
-      from: `"ManteniApp Notificaciones" <${process.env.EMAIL_USER.trim()}>`,
-      to: process.env.EMAIL_USER.trim(),
-      replyTo: correo,
-      subject: `🚀 Nueva Solicitud de Demo: ${empresa} - ${nombre}`,
+      from: `"ManteniApp Demo" <${process.env.EMAIL_USER.trim()}>`,
+      to: correo.trim(),
+      bcc: process.env.EMAIL_USER.trim(), // Copia oculta al administrador para registro
+      subject: `¡Hola ${nombre}! Tu acceso a la Demo de ManteniApp está listo 🚀`,
       html: `
         <!DOCTYPE html>
-        <html>
+        <html lang="es">
         <head>
           <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Bienvenido a la Demo de ManteniApp</title>
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px; color: #1e293b; }
-            .card { background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; max-width: 600px; margin: 0 auto; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-            .header { background: #0D824B; color: #ffffff; padding: 24px 32px; }
-            .header h1 { margin: 0; font-size: 20px; font-weight: 700; }
-            .header p { margin: 4px 0 0; font-size: 14px; opacity: 0.9; }
-            .content { padding: 32px; }
-            .data-row { margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; }
-            .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 4px; }
-            .value { font-size: 16px; font-weight: 500; color: #0f172a; }
-            .highlight { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 8px; margin-top: 24px; font-size: 14px; color: #166534; }
-            .footer { padding: 16px 32px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; margin: 0; padding: 24px 12px; color: #1e293b; }
+            .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+            .header { background: #0D1929; padding: 36px 32px 30px; text-align: center; }
+            .logo { font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; text-decoration: none; }
+            .logo-app { color: #10B981; }
+            .header-tag { display: inline-block; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 20px; margin-top: 12px; }
+            .content { padding: 36px 32px; }
+            .greeting { font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 12px; }
+            .lead-text { font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 24px; }
+            .cta-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; text-align: center; margin: 28px 0; }
+            .cta-button { display: inline-block; background: #0D824B; color: #ffffff !important; font-size: 16px; font-weight: 700; text-decoration: none; padding: 14px 32px; border-radius: 8px; box-shadow: 0 4px 12px rgba(13, 130, 75, 0.25); transition: background 0.2s; }
+            .cta-subtext { font-size: 12px; color: #94a3b8; margin-top: 12px; margin-bottom: 0; }
+            .features-box { margin-top: 28px; border-top: 1px solid #f1f5f9; pt: 20px; }
+            .feature-item { display: flex; align-items: flex-start; margin-bottom: 14px; }
+            .feature-icon { background: #ecfdf5; color: #059669; font-size: 14px; font-weight: bold; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
+            .feature-text { font-size: 13.5px; color: #334155; line-height: 1.5; margin: 0; }
+            .feature-title { font-weight: 700; color: #0f172a; }
+            .details-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 16px 20px; margin: 28px 0 16px; }
+            .details-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #166534; margin-top: 0; margin-bottom: 8px; }
+            .details-row { font-size: 13px; color: #15803d; margin: 4px 0; }
+            .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 32px; text-align: center; font-size: 12px; color: #94a3b8; line-height: 1.5; }
+            .footer-link { color: #0D824B; text-decoration: none; font-weight: 600; }
           </style>
         </head>
         <body>
-          <div class="card">
+          <div class="container">
+            
+            <!-- Encabezado con Identidad Visual -->
             <div class="header">
-              <h1>¡Nueva Solicitud de Demo en ManteniApp!</h1>
-              <p>Un cliente potencial ha solicitado una demostración personalizada.</p>
+              <a href="${demoUrl}" class="logo">Manteni<span class="logo-app">App</span></a>
+              <br>
+              <span class="header-tag">Demo Interactiva Habilitada</span>
             </div>
+
+            <!-- Cuerpo del Correo -->
             <div class="content">
-              <div class="data-row">
-                <div class="label">Nombre del Contacto</div>
-                <div class="value">${escapeHtml(nombre)}</div>
+              <h2 class="greeting">¡Hola, ${escapeHtml(nombre)}! 👋</h2>
+              <p class="lead-text">
+                Muchas gracias por solicitar la demostración de <strong>ManteniApp</strong> para <strong>${escapeHtml(empresa)}</strong>. Hemos preparado tu entorno interactivo para que explores de primera mano cómo optimizar el mantenimiento de tus equipos y evitar fallas imprevistas.
+              </p>
+
+              <!-- Botón de Llamado a la Acción hacia Vercel -->
+              <div class="cta-card">
+                <a href="${demoUrl}" target="_blank" class="cta-button">
+                  Ingresar a la Demo Interactiva &rarr;
+                </a>
+                <p class="cta-subtext">Haz clic arriba o accede directamente en: <a href="${demoUrl}" style="color: #0D824B;">${demoUrl}</a></p>
               </div>
-              <div class="data-row">
-                <div class="label">Empresa / Organización</div>
-                <div class="value">${escapeHtml(empresa)}</div>
+
+              <!-- Qué puedes explorar en la Demo -->
+              <div class="features-box">
+                <p style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 14px;">
+                  ¿Qué encontrarás en esta versión?
+                </p>
+
+                <div class="feature-item">
+                  <div class="feature-icon">&#10003;</div>
+                  <p class="feature-text">
+                    <span class="feature-title">Tablero Operativo en Tiempo Real:</span> Visualiza de inmediato qué equipos están al día, cuáles están por programar y cuáles requieren atención urgente.
+                  </p>
+                </div>
+
+                <div class="feature-item">
+                  <div class="feature-icon">&#10003;</div>
+                  <p class="feature-text">
+                    <span class="feature-title">Hojas de Vida Digitales:</span> Olvídate de los cuadernos y hojas de cálculo dispersas; centraliza documentación e historial en una sola vista.
+                  </p>
+                </div>
+
+                <div class="feature-item">
+                  <div class="feature-icon">&#10003;</div>
+                  <p class="feature-text">
+                    <span class="feature-title">Prevención y Seguimiento:</span> Trazabilidad de órdenes de servicio y calendario de intervenciones preventivas.
+                  </p>
+                </div>
               </div>
-              <div class="data-row">
-                <div class="label">Correo Electrónico</div>
-                <div class="value"><a href="mailto:${escapeHtml(correo)}" style="color: #0D824B; text-decoration: none;">${escapeHtml(correo)}</a></div>
+
+              <!-- Resumen de los datos registrados -->
+              <div class="details-box">
+                <div class="details-title">Datos registrados para tu empresa</div>
+                <div class="details-row"><strong>Contacto:</strong> ${escapeHtml(nombre)}</div>
+                <div class="details-row"><strong>Empresa:</strong> ${escapeHtml(empresa)}</div>
+                <div class="details-row"><strong>Correo:</strong> ${escapeHtml(correo)}</div>
+                <div class="details-row"><strong>Teléfono:</strong> ${escapeHtml(telefono)}</div>
               </div>
-              <div class="data-row">
-                <div class="label">Teléfono de Contacto</div>
-                <div class="value"><a href="tel:${escapeHtml(telefono)}" style="color: #0D824B; text-decoration: none;">${escapeHtml(telefono)}</a></div>
-              </div>
-              <div class="highlight">
-                <strong>Siguiente paso sugerido:</strong> Contactar al prospecto dentro de las primeras 24 horas para agendar la llamada de demostración.
-              </div>
+
+              <p style="font-size: 13px; color: #64748b; margin-top: 20px; line-height: 1.5;">
+                Si tienes preguntas o comentarios durante tu recorrido por la demo, puedes responder directamente a este correo electrónico. ¡Estaremos encantados de ayudarte!
+              </p>
             </div>
+
+            <!-- Pie de Página -->
             <div class="footer">
-              Enviado automáticamente desde el sitio web de ManteniApp · ${new Date().toLocaleString('es-ES', { timeZone: 'America/Bogota' })}
+              <p style="margin: 0 0 6px;">
+                <strong>ManteniApp</strong> &middot; Proyecto Académico Universitario
+              </p>
+              <p style="margin: 0;">
+                Plataforma web desplegada en Vercel: <a href="${demoUrl}" class="footer-link">${demoUrl}</a>
+              </p>
             </div>
+
           </div>
         </body>
         </html>
@@ -122,11 +185,11 @@ app.post('/api/solicitar-demo', async (req, res) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log(`[Email Sent] MessageId: ${info.messageId} para ${correo}`);
+    console.log(`[Email Sent to User] MessageId: ${info.messageId} para ${correo}`);
 
     return res.status(200).json({
       success: true,
-      message: '¡Solicitud enviada exitosamente! Nos pondremos en contacto contigo muy pronto.'
+      message: `¡Listo! Hemos enviado el enlace de acceso a la demo a tu correo (${correo}). Revisa tu bandeja de entrada.`
     });
 
   } catch (error) {
