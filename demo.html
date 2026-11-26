@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ManteniApp | Panel de Control Operativo - Demo</title>
+  <meta name="description" content="Demo interactiva de ManteniApp: Panel de control de mantenimiento para MiPymes, hojas de vida de maquinaria, alertas preventivas y control de activos.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230D824B'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              navy: '#0D1929',       // Deep Navy sidebar & strong headings
+              navyCard: '#152238',   // Sidebar subcards
+              navyHover: '#1c2d4a',  // Sidebar items hover
+              navyActive: '#123028', // Active nav item dark teal
+              emerald: '#0D824B',    // Brand Emerald CTA
+              emeraldHover: '#0a6a3d',
+              emeraldLight: '#ecfdf5',
+              emeraldBorder: '#a7f3d0',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1 {
+      font-size: 1.5rem !important; /* 24px */
+      line-height: 1.25 !important;
+      font-weight: 800 !important;
+    }
+    h2 {
+      font-size: 1.5rem !important; /* 24px */
+      line-height: 1.25 !important;
+      font-weight: 800 !important;
+    }
+    h3 {
+      font-size: 1.25rem !important; /* 20px */
+      line-height: 1.3 !important;
+      font-weight: 700 !important;
+    }
+    h4 {
+      font-size: 0.95rem !important; /* ~15px */
+      line-height: 1.4 !important;
+      font-weight: 700 !important;
+    }
+    ::selection {
+      background-color: #0D824B;
+      color: #ffffff;
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .modal-backdrop {
+      animation: fadeIn 0.15s ease-out forwards;
+    }
+    .modal-panel {
+      animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body class="h-full text-slate-800 antialiased bg-slate-50 flex overflow-hidden">
+
+  <!-- ========================================================================= -->
+  <!-- SIDEBAR LATERAL (Responsive con Drawer Móvil) -->
+  <!-- ========================================================================= -->
+  
+  <!-- Backdrop para móvil -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/60 z-40 hidden lg:hidden backdrop-blur-xs transition-opacity"></div>
+
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-brand-navy text-slate-300 flex flex-col justify-between shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out border-r border-slate-800/80 select-none">
+    
+    <!-- Top Sidebar Content -->
+    <div class="p-5 flex-1 overflow-y-auto">
+      
+      <!-- Brand Logo + Demo Tag -->
+      <div class="flex items-center justify-between pb-4">
+        <a href="demo.html" class="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-white group">
+          <span>Manteni</span><span class="text-emerald-400">App</span>
+          <span class="ml-1.5 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">DEMO</span>
+        </a>
+        <button id="close-sidebar-btn" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Workshop / Organization Card -->
+      <div class="bg-brand-navyCard border border-slate-700/50 rounded-xl p-3 flex items-center gap-3 my-3">
+        <div class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center shrink-0 border border-slate-700">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <div class="overflow-hidden">
+          <div class="text-xs font-bold text-white truncate">Taller San Jorge</div>
+          <div class="text-[11px] text-slate-400 truncate">MiPyme Demo</div>
+        </div>
+      </div>
+
+      <!-- Navigation Section -->
+      <div class="mt-6">
+        <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+          Principal
+        </div>
+        <nav class="space-y-1">
+          
+          <!-- Item 1: Dashboard (Activo) -->
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-brand-navyActive text-white font-semibold text-xs border border-emerald-500/20 shadow-xs transition-colors">
+            <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+
+          <!-- Item 2: Mis Equipos -->
+          <button onclick="scrollToEquipmentTable()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-brand-navyHover font-medium text-xs transition-colors text-left">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+            </svg>
+            <span class="truncate">Mis Equipos (Hojas de Vida)</span>
+          </button>
+
+          <!-- Item 3: Calendario y Alertas -->
+          <button onclick="toggleAlertsDropdown()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-brand-navyHover font-medium text-xs transition-colors">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span>Calendario y Alertas</span>
+            </div>
+            <span id="sidebar-alert-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">3</span>
+          </button>
+
+          <!-- Item 4: Órdenes de Servicio -->
+          <a href="#" onclick="showDemoToast('Módulo de Órdenes de Servicio habilitado en versión completa'); return false;" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-brand-navyHover font-medium text-xs transition-colors">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+            </svg>
+            <span>Órdenes de Servicio</span>
+          </a>
+
+          <!-- Item 5: Configuración -->
+          <a href="#" onclick="showDemoToast('Ajustes de taller y usuarios disponibles en versión completa'); return false;" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-brand-navyHover font-medium text-xs transition-colors">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>Configuración</span>
+          </a>
+
+        </nav>
+      </div>
+
+      <!-- Banner Promo Card -->
+      <div class="mt-8 bg-brand-navyCard/90 border border-slate-700/50 rounded-xl p-3.5">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-white">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>Explora sin límites</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1.5 mb-2 leading-relaxed">
+          Datos de ejemplo para conocer todo lo que puedes gestionar.
+        </p>
+        <div class="flex items-center justify-between">
+          <a href="index.html" class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition">
+            <span>Conocer ManteniApp</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom User Profile Footer -->
+    <div class="p-4 border-t border-slate-800 bg-[#09121e]">
+      <div class="flex items-center justify-between text-xs cursor-pointer hover:opacity-90">
+        <div class="flex items-center gap-2.5 overflow-hidden">
+          <div class="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 font-bold flex items-center justify-center border border-slate-700 shrink-0 text-[11px]">
+            SJ
+          </div>
+          <div class="overflow-hidden">
+            <div class="text-xs font-bold text-white truncate">Taller San Jorge</div>
+            <div class="text-[10px] text-slate-400 truncate">(MiPyme Demo)</div>
+          </div>
+        </div>
+        <button onclick="resetDemoData()" title="Restablecer datos originales de prueba" class="text-slate-400 hover:text-emerald-400 p-1 transition" aria-label="Restablecer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+
+  <!-- ========================================================================= -->
+  <!-- MAIN WORKSPACE CONTAINER -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex flex-col lg:pl-64 h-full min-w-0 overflow-hidden">
+    
+    <!-- TOPBAR / HEADER -->
+    <header class="bg-white border-b border-slate-200 h-16 shrink-0 flex items-center justify-between px-4 sm:px-6 z-30">
+      
+      <!-- Mobile hamburger + Breadcrumbs -->
+      <div class="flex items-center gap-3">
+        <button id="open-sidebar-btn" class="lg:hidden text-slate-600 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-100">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight leading-tight">Panel de Control Operativo</h1>
+          <p class="text-[11px] text-slate-400">ManteniApp / Dashboard</p>
+        </div>
+      </div>
+
+      <!-- Search Bar + New Equipment Button + Notification Bell -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Search Input with Shortcut -->
+        <div class="relative hidden sm:block w-64 md:w-80">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <input type="text" id="global-search-input" placeholder="Buscar maquinaria o activos..."
+                 class="w-full pl-9 pr-12 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald transition">
+          <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+            <kbd class="px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 rounded shadow-2xs">⌘ K</kbd>
+          </div>
+        </div>
+
+        <!-- Button: Registrar Nuevo Equipo -->
+        <button onclick="openNewEquipmentModal()"
+                class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-emerald hover:bg-brand-emeraldHover active:scale-95 text-white font-bold text-xs rounded-lg shadow-xs transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span class="hidden sm:inline">Registrar Nuevo Equipo</span>
+          <span class="sm:hidden">Nuevo</span>
+        </button>
+
+        <!-- Notification Bell Dropdown Button -->
+        <div class="relative">
+          <button id="bell-btn" onclick="toggleAlertsDropdown()"
+                  class="p-2 text-slate-600 hover:text-slate-900 rounded-lg border border-slate-200 hover:bg-slate-50 relative focus:outline-none"
+                  aria-label="Ver alertas">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span id="bell-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-extrabold rounded-full flex items-center justify-center ring-2 ring-white">3</span>
+          </button>
+
+          <!-- Dropdown Popover -->
+          <div id="alerts-dropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden">
+            <div class="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-900">Notificaciones de Mantenimiento</span>
+                <span id="alerts-count-badge" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">3 pendientes</span>
+              </div>
+              <button onclick="toggleAlertsDropdown()" class="text-slate-400 hover:text-slate-600 text-xs">✕</button>
+            </div>
+            <div id="alerts-list" class="max-h-72 overflow-y-auto divide-y divide-slate-100 text-xs">
+              <!-- Populated dynamically via JS -->
+            </div>
+            <div class="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+              <button onclick="scrollToEquipmentTable(); toggleAlertsDropdown();" class="text-xs font-bold text-brand-emerald hover:underline">
+                Ver todos los equipos en la tabla &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- SCROLLABLE DASHBOARD BODY -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+      
+      <!-- SUBHEADER TITLE & DATE -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Tu operación, bajo control</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Anticípate a las fallas y mantén tus equipos en marcha.</p>
+        </div>
+        <div class="inline-flex items-center gap-2 self-start sm:self-auto bg-white px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 shadow-2xs">
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span id="current-date-badge">Jueves, 26 nov. 2026</span>
+        </div>
+      </div>
+
+
+      <!-- 4 DYNAMIC KPI CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- KPI 1: Total Equipos -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-slate-500">Total Equipos</span>
+              <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span id="kpi-total" class="text-3xl font-extrabold text-slate-900 tracking-tight">14</span>
+              <span class="text-xs text-slate-500 font-medium">activos</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400 font-medium mt-3">
+            Inventario registrado
+          </div>
+        </div>
+
+        <!-- KPI 2: En Estado Óptimo -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-slate-500">En Estado Óptimo</span>
+              <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span id="kpi-al-dia" class="text-3xl font-extrabold text-slate-900 tracking-tight">10</span>
+              <span class="text-xs text-slate-500 font-medium">equipos</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700">
+              Al día
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI 3: Mantenimientos Próximos -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-slate-500">Mantenimientos Próximos</span>
+              <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span id="kpi-proximos" class="text-3xl font-extrabold text-slate-900 tracking-tight">3</span>
+              <span class="text-xs text-slate-500 font-medium">equipos</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-700">
+              Próximos 7 días
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI 4: Mantenimientos Vencidos -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-slate-500">Mantenimientos Vencidos</span>
+              <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span id="kpi-vencidos" class="text-3xl font-extrabold text-slate-900 tracking-tight">1</span>
+              <span class="text-xs text-slate-500 font-medium">equipo</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-700">
+              Requiere atención
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- EQUIPMENT TABLE CARD ("Estado de tus equipos") -->
+      <section id="tabla-equipos-container" class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
+        
+        <!-- Header Controls -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">Estado de tus equipos</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Consulta el mantenimiento y la hoja de vida de cada activo.</p>
+          </div>
+          <button onclick="toggleShowAllEquipments()" id="btn-toggle-view"
+                  class="self-start md:self-auto px-3.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+            Ver todos los equipos
+          </button>
+        </div>
+
+        <!-- Filter Segmented Tabs & Sorter -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4">
+          
+          <!-- Segmented Filter Tabs -->
+          <div class="bg-slate-100 p-1 rounded-xl inline-flex flex-wrap items-center gap-1 text-xs font-semibold self-start">
+            <button onclick="setFilter('todos')" id="filter-btn-todos"
+                    class="filter-tab px-3 py-1.5 rounded-lg transition-all bg-brand-navy text-white shadow-2xs">
+              <span>Todos</span>
+              <span id="tab-count-todos" class="ml-1 opacity-80 font-normal">14</span>
+            </button>
+            <button onclick="setFilter('al_dia')" id="filter-btn-al_dia"
+                    class="filter-tab px-3 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900">
+              <span>Al día</span>
+              <span id="tab-count-al_dia" class="ml-1 opacity-80 font-normal">10</span>
+            </button>
+            <button onclick="setFilter('proximos')" id="filter-btn-proximos"
+                    class="filter-tab px-3 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900">
+              <span>Próximos</span>
+              <span id="tab-count-proximos" class="ml-1 opacity-80 font-normal">3</span>
+            </button>
+            <button onclick="setFilter('vencidos')" id="filter-btn-vencidos"
+                    class="filter-tab px-3 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900">
+              <span>Vencidos</span>
+              <span id="tab-count-vencidos" class="ml-1 opacity-80 font-normal">1</span>
+            </button>
+          </div>
+
+          <!-- Sorter Dropdown -->
+          <div class="flex items-center gap-2 self-end sm:self-auto text-xs text-slate-500">
+            <span>Ordenar:</span>
+            <select id="sort-select" onchange="handleSortChange(this.value)"
+                    class="bg-transparent font-medium text-slate-800 border-none outline-none focus:ring-0 cursor-pointer text-xs">
+              <option value="proxima_fecha">próxima fecha</option>
+              <option value="nombre">nombre del equipo</option>
+              <option value="codigo">código / serie</option>
+              <option value="estado">prioridad / estado</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Table Container (Horizontal Scroll en Mobile) -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-[10px] uppercase font-bold tracking-wider text-slate-400 border-b border-slate-100">
+                <th class="py-3 px-3">Equipo</th>
+                <th class="py-3 px-3">Código / Serie</th>
+                <th class="py-3 px-3">Ubicación</th>
+                <th class="py-3 px-3">Último servicio</th>
+                <th class="py-3 px-3">Próxima fecha</th>
+                <th class="py-3 px-3">Estado</th>
+                <th class="py-3 px-3 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="equipment-table-body" class="divide-y divide-slate-100">
+              <!-- Populated dynamically via JavaScript -->
+            </tbody>
+          </table>
+
+          <!-- Empty State (if search or filter has 0 results) -->
+          <div id="table-empty-state" class="hidden text-center py-12">
+            <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-sm font-bold text-slate-700">No se encontraron equipos</p>
+            <p class="text-xs text-slate-400 mt-1">Intenta con otro término de búsqueda o limpia los filtros.</p>
+            <button onclick="resetFiltersAndSearch()" class="mt-3 px-3 py-1.5 text-xs font-semibold text-brand-emerald bg-emerald-50 rounded-lg hover:bg-emerald-100">
+              Restablecer filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Pagination & Counter Footer -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-5 mt-2 border-t border-slate-100 text-xs text-slate-500">
+          <div id="table-showing-counter">
+            Mostrando 3 de 14 equipos · Datos de demostración
+          </div>
+          <div class="flex items-center gap-1 self-center sm:self-auto">
+            <button id="btn-prev-page" onclick="changePage(-1)" class="px-2.5 py-1 rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">
+              Anterior
+            </button>
+            <div id="pagination-pages" class="flex items-center gap-1">
+              <!-- Page pills rendered via JS -->
+            </div>
+            <button id="btn-next-page" onclick="changePage(1)" class="px-2.5 py-1 rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">
+              Siguiente
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- BOTTOM 2 INSIGHT CARDS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Urgency Card (Sierra Cinta / Vencido) -->
+        <div id="insight-urgent-card" class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-900">Hay un equipo que necesita atención</h4>
+                <p id="urgent-card-desc" class="text-xs text-slate-500 mt-0.5">La Sierra Cinta tiene un mantenimiento vencido.</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-50">
+            <span id="urgent-card-badge" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-rose-50 text-rose-700">
+              Vencido hace 3 días
+            </span>
+            <button onclick="openUrgentEquipment()" class="inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:text-rose-800 transition">
+              <span>Revisar equipo</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Upcoming Maintenance Card (Compresor 50HP) -->
+        <div id="insight-upcoming-card" class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-900">Tu próximo mantenimiento</h4>
+                <p id="upcoming-card-desc" class="text-xs text-slate-500 mt-0.5">Compresor 50HP · Cambio de aceite y filtros</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-50">
+            <div class="flex items-center gap-2">
+              <span id="upcoming-card-date" class="text-xs font-bold text-slate-800">28 NOV</span>
+              <span id="upcoming-card-badge" class="text-xs text-slate-500">En 2 días</span>
+            </div>
+            <button onclick="openUpcomingEquipment()" class="inline-flex items-center gap-1 text-xs font-bold text-brand-emerald hover:text-brand-emeraldHover transition">
+              <span>Ver calendario</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- DEMO FOOTER DISCLAIMER -->
+      <footer class="pt-6 pb-2 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-400">
+        <div>DEMO · Información ilustrativa, no conectada a equipos reales.</div>
+        <div>ManteniApp · Gestión de mantenimiento MiPymes</div>
+      </footer>
+
+    </main>
+
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: HOJA DE VIDA / DETALLE DEL EQUIPO (mockup-Hoja-de-vida-abierta.png) -->
+  <!-- ========================================================================= -->
+  <div id="modal-hoja-vida" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <!-- Backdrop oscuro -->
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity modal-backdrop" onclick="closeHojaVidaModal()"></div>
+
+    <!-- Centrado del modal -->
+    <div class="flex min-h-full items-center justify-center p-4 sm:p-6 text-center">
+      <div class="modal-panel relative w-full max-w-4xl transform rounded-2xl bg-white text-left shadow-2xl transition-all overflow-hidden border border-slate-200">
+        
+        <!-- Modal Header -->
+        <div class="px-6 sm:px-8 pt-6 pb-4 border-b border-slate-100 flex items-start justify-between">
+          <div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Hoja de vida del equipo</div>
+            <div class="flex items-center gap-3 mt-1">
+              <h3 id="modal-equipo-nombre" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Torno CNC Haas</h3>
+              <span id="modal-equipo-badge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Al día
+              </span>
+            </div>
+            <p id="modal-equipo-serie" class="text-xs text-slate-500 mt-0.5">EQ-001 / Serie VF2-2021-084</p>
+          </div>
+          <button onclick="closeHojaVidaModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition" aria-label="Cerrar modal">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="px-6 sm:px-8 py-6 space-y-6 max-h-[75vh] overflow-y-auto">
+          
+          <!-- Top Row: Imagen + Plan Preventivo Card -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+            
+            <!-- Left: Foto de Maquinaria Industrial -->
+            <div class="md:col-span-5 flex flex-col">
+              <div class="relative w-full h-48 sm:h-52 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center group">
+                <img id="modal-equipo-img" src="https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=800&auto=format&fit=crop"
+                     alt="Maquinaria industrial" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-slate-900/10 pointer-events-none"></div>
+              </div>
+              <p class="text-[11px] text-slate-400 text-center mt-2">Imagen de referencia · Demo</p>
+            </div>
+
+            <!-- Right: Plan Preventivo Widget -->
+            <div class="md:col-span-7 bg-slate-50/70 border border-slate-100 rounded-xl p-5 flex flex-col justify-between">
+              <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3">Plan Preventivo</div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <div class="text-[11px] text-slate-500">Último servicio</div>
+                    <div id="modal-plan-ultimo" class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">10 nov. 2026</div>
+                    <div class="text-xs font-semibold text-emerald-600 mt-0.5">Completado</div>
+                  </div>
+                  <div>
+                    <div class="text-[11px] text-slate-500">Próximo mantenimiento</div>
+                    <div id="modal-plan-proximo" class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">10 dic. 2026</div>
+                    <div id="modal-plan-frecuencia" class="text-xs text-slate-500 mt-0.5">En 14 días · Frecuencia mensual</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Quick Info Note inside plan -->
+              <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-2 text-xs text-slate-600">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Frecuencia ajustada según recomendaciones del fabricante.</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Middle Split: Especificaciones Técnicas (Izquierda) + Historial de Mantenimientos (Derecha) -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
+            
+            <!-- Left: Especificaciones Técnicas -->
+            <div class="md:col-span-5 space-y-4">
+              <h4 class="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100">Especificaciones técnicas</h4>
+              <div class="space-y-2.5 text-xs">
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Fabricante</span>
+                  <span id="modal-spec-fabricante" class="font-semibold text-slate-800 text-right">Haas Automation</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Modelo</span>
+                  <span id="modal-spec-modelo" class="font-semibold text-slate-800 text-right">VF-2</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Año de fabricación</span>
+                  <span id="modal-spec-anio" class="font-semibold text-slate-800 text-right">2021</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Potencia</span>
+                  <span id="modal-spec-potencia" class="font-semibold text-slate-800 text-right">22,4 kW</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Ubicación</span>
+                  <span id="modal-spec-ubicacion" class="font-semibold text-slate-800 text-right">Planta A · Mecanizado</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Responsable</span>
+                  <span id="modal-spec-responsable" class="font-semibold text-slate-800 text-right">Carlos Méndez</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Historial de mantenimientos -->
+            <div class="md:col-span-7 space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h4 class="text-sm font-bold text-slate-900">Historial de mantenimientos</h4>
+                <span id="modal-historial-count" class="text-xs text-slate-400">3 registros</span>
+              </div>
+              <p class="text-xs text-slate-500">Intervenciones completadas y trazabilidad del equipo.</p>
+              
+              <!-- Timeline Items Container -->
+              <div id="modal-historial-list" class="space-y-3 pt-1">
+                <!-- Injected via JavaScript -->
+              </div>
+
+              <!-- Banner inferior informativo -->
+              <div class="bg-emerald-50 border border-emerald-200/60 rounded-xl p-3 flex items-center gap-2.5 text-xs text-emerald-900">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span>Cada servicio queda registrado automáticamente en la hoja de vida del equipo.</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 sm:px-8 py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div id="modal-footer-updated" class="text-xs text-slate-400">
+            Actualizado el 10 nov. 2026 · Datos de demostración
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button onclick="closeHojaVidaModal()"
+                    class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition shadow-2xs">
+              Cerrar
+            </button>
+            <button id="btn-completar-mantenimiento" onclick="completarMantenimientoModal()"
+                    class="px-4 py-2 bg-brand-emerald hover:bg-brand-emeraldHover active:scale-95 text-white font-bold text-xs rounded-lg shadow-xs transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              <span>Completar Mantenimiento</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: REGISTRAR NUEVO EQUIPO -->
+  <!-- ========================================================================= -->
+  <div id="modal-nuevo-equipo" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity modal-backdrop" onclick="closeNewEquipmentModal()"></div>
+    <div class="flex min-h-full items-center justify-center p-4 sm:p-6 text-center">
+      <div class="modal-panel relative w-full max-w-lg transform rounded-2xl bg-white text-left shadow-2xl transition-all overflow-hidden border border-slate-200">
+        
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Registrar Nuevo Equipo</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Ingresa los datos para crear una nueva hoja de vida.</p>
+          </div>
+          <button onclick="closeNewEquipmentModal()" class="text-slate-400 hover:text-slate-600 p-1">✕</button>
+        </div>
+
+        <!-- Formulario -->
+        <form id="form-nuevo-equipo" onsubmit="handleNewEquipmentSubmit(event)" class="p-6 space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Nombre del equipo *</label>
+            <input type="text" id="new-nombre" required placeholder="Ej: Prensa Hidráulica 100T"
+                   class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Código del activo *</label>
+              <input type="text" id="new-codigo" required placeholder="Ej: EQ-015"
+                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Serie / Placa</label>
+              <input type="text" id="new-serie" placeholder="Ej: PH-2023-991"
+                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Ubicación *</label>
+              <input type="text" id="new-ubicacion" required placeholder="Ej: Planta A - Prensas"
+                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Frecuencia (días) *</label>
+              <input type="number" id="new-frecuencia" required min="7" max="365" value="30"
+                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Categoría / Tipo</label>
+              <input type="text" id="new-categoria" placeholder="Ej: Equipo Hidráulico"
+                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Responsable</label>
+              <input type="text" id="new-responsable" placeholder="Ej: Carlos Méndez"
+                     class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald">
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+            <button type="button" onclick="closeNewEquipmentModal()"
+                    class="px-4 py-2 bg-white border border-slate-200 rounded-lg font-semibold text-slate-700 hover:bg-slate-50 transition">
+              Cancelar
+            </button>
+            <button type="submit"
+                    class="px-4 py-2 bg-brand-emerald hover:bg-brand-emeraldHover text-white font-bold rounded-lg shadow-xs transition">
+              Guardar Equipo
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- FLOATING TOAST NOTIFICATION CONTAINER -->
+  <!-- ========================================================================= -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: ESTADO EN MEMORIA, REACTIVIDAD Y COMPORTAMIENTO DEMO -->
+  <!-- ========================================================================= -->
+  <script>
+    // ---------------------------------------------------------------------------
+    // 1. DATASET INICIAL DE EQUIPOS (Mock data idéntico a las imágenes Figma)
+    // ---------------------------------------------------------------------------
+    const DEFAULT_EQUIPOS = [
+      {
+        id: 'EQ-001',
+        nombre: 'Torno CNC Haas',
+        categoria: 'Centro de mecanizado',
+        serie: 'VF2-2021-084',
+        ubicacion: 'Planta A',
+        area: 'Mecanizado',
+        ultimoServicio: '10 nov. 2026',
+        proximaFecha: '10 dic. 2026',
+        estado: 'al_dia', // 'al_dia', 'proximos', 'vencidos'
+        frecuenciaDias: 30,
+        fabricante: 'Haas Automation',
+        modelo: 'VF-2',
+        anio: 2021,
+        potencia: '22,4 kW',
+        responsable: 'Carlos Méndez',
+        imagen: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Mantenimiento preventivo',
+            fecha: '10 NOV 2026',
+            orden: 'OS-024',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Cambio de aceite, lubricación y revisión de guías.',
+            estado: 'Completado'
+          },
+          {
+            titulo: 'Inspección general',
+            fecha: '10 OCT 2026',
+            orden: 'OS-018',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Limpieza de filtros y ajuste del sistema de refrigeración.',
+            estado: 'Completado'
+          },
+          {
+            titulo: 'Revisión de seguridad',
+            fecha: '10 SEP 2026',
+            orden: 'OS-012',
+            responsable: 'Laura Gómez',
+            descripcion: 'Verificación eléctrica y prueba de parada de emergencia.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-002',
+        nombre: 'Compresor 50HP',
+        categoria: 'Sistema de aire comprimido',
+        serie: 'CP50-2019-312',
+        ubicacion: 'Planta B',
+        area: 'Servicios',
+        ultimoServicio: '28 oct. 2026',
+        proximaFecha: '28 nov. 2026',
+        estado: 'proximos',
+        frecuenciaDias: 30,
+        fabricante: 'Atlas Copco',
+        modelo: 'GA 37 VSD',
+        anio: 2019,
+        potencia: '37 kW',
+        responsable: 'Carlos Méndez',
+        imagen: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Revisión de filtros de admisión',
+            fecha: '28 OCT 2026',
+            orden: 'OS-022',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Purgado del tanque de condensados y ajuste de bandas.',
+            estado: 'Completado'
+          },
+          {
+            titulo: 'Cambio de aceite sintético',
+            fecha: '28 SEP 2026',
+            orden: 'OS-015',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Reemplazo total de fluido refrigerante y separador de aceite.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-003',
+        nombre: 'Sierra Cinta',
+        categoria: 'Equipo de corte',
+        serie: 'SC-2020-156',
+        ubicacion: 'Planta A',
+        area: 'Corte',
+        ultimoServicio: '23 oct. 2026',
+        proximaFecha: '23 nov. 2026',
+        estado: 'vencidos',
+        frecuenciaDias: 30,
+        fabricante: 'DoALL',
+        modelo: 'C-916SA',
+        anio: 2020,
+        potencia: '5,5 kW',
+        responsable: 'Laura Gómez',
+        imagen: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Alineación de guías de carburo',
+            fecha: '23 OCT 2026',
+            orden: 'OS-020',
+            responsable: 'Laura Gómez',
+            descripcion: 'Tensión de cinta bimetálica y ajuste de fluido de corte.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-004',
+        nombre: 'Fresadora Universal',
+        categoria: 'Mecanizado convencional',
+        serie: 'FU-2018-044',
+        ubicacion: 'Planta A',
+        area: 'Mecanizado',
+        ultimoServicio: '15 nov. 2026',
+        proximaFecha: '15 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Lagun',
+        modelo: 'FTV-2',
+        anio: 2018,
+        potencia: '7,5 kW',
+        responsable: 'Carlos Méndez',
+        imagen: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Engrase de bancada y husillos',
+            fecha: '15 NOV 2026',
+            orden: 'OS-026',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Verificación de juegos axiales y cambio de refrigerante.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-005',
+        nombre: 'Montacargas Eléctrico',
+        categoria: 'Logística y carga',
+        serie: 'MC-2022-780',
+        ubicacion: 'Almacén Central',
+        area: 'Logística',
+        ultimoServicio: '02 nov. 2026',
+        proximaFecha: '02 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Toyota Material Handling',
+        modelo: '8FBE20',
+        anio: 2022,
+        potencia: 'Batería 48V',
+        responsable: 'Andrés Morales',
+        imagen: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Inspección de sistema hidráulico y frenos',
+            fecha: '02 NOV 2026',
+            orden: 'OS-023',
+            responsable: 'Andrés Morales',
+            descripcion: 'Niveles de electrolito en baterías y revisión de mástil.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-006',
+        nombre: 'Generador Diésel de Emergencia',
+        categoria: 'Generación eléctrica',
+        serie: 'GD-2017-901',
+        ubicacion: 'Planta B',
+        area: 'Subestación',
+        ultimoServicio: '01 nov. 2026',
+        proximaFecha: '01 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Cummins',
+        modelo: 'C150 D5',
+        anio: 2017,
+        potencia: '150 kVA',
+        responsable: 'Carlos Méndez',
+        imagen: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Prueba de arranque con carga',
+            fecha: '01 NOV 2026',
+            orden: 'OS-021',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Revisión de precalentador y nivel de combustible diésel.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-007',
+        nombre: 'Prensa Hidráulica 100T',
+        categoria: 'Conformado metálico',
+        serie: 'PH-2021-112',
+        ubicacion: 'Planta A',
+        area: 'Troquelado',
+        ultimoServicio: '29 oct. 2026',
+        proximaFecha: '29 nov. 2026',
+        estado: 'proximos',
+        frecuenciaDias: 30,
+        fabricante: 'Menziken',
+        modelo: 'H-100',
+        anio: 2021,
+        potencia: '18 kW',
+        responsable: 'Laura Gómez',
+        imagen: 'https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Revisión de sellos y presión',
+            fecha: '29 OCT 2026',
+            orden: 'OS-019',
+            responsable: 'Laura Gómez',
+            descripcion: 'Calibración de válvulas reguladoras y prueba hidrostática.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-008',
+        nombre: 'Soldadora TIG / MIG Industrial',
+        categoria: 'Unión y soldadura',
+        serie: 'SOL-2022-304',
+        ubicacion: 'Planta A',
+        area: 'Ensamble',
+        ultimoServicio: '12 nov. 2026',
+        proximaFecha: '12 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Miller Electric',
+        modelo: 'Syncrowave 210',
+        anio: 2022,
+        potencia: '8,5 kW',
+        responsable: 'Andrés Morales',
+        imagen: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Limpieza de antorcha y bornes',
+            fecha: '12 NOV 2026',
+            orden: 'OS-025',
+            responsable: 'Andrés Morales',
+            descripcion: 'Comprobación de flujo de argón y aislamiento térmico.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-009',
+        nombre: 'Puente Grúa 5 Toneladas',
+        categoria: 'Elevación e izaje',
+        serie: 'PG-2016-015',
+        ubicacion: 'Nave Principal',
+        area: 'Logística',
+        ultimoServicio: '30 oct. 2026',
+        proximaFecha: '30 nov. 2026',
+        estado: 'proximos',
+        frecuenciaDias: 30,
+        fabricante: 'Konecranes',
+        modelo: 'CXT 5T',
+        anio: 2016,
+        potencia: '11 kW',
+        responsable: 'Carlos Méndez',
+        imagen: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Inspección de cable de acero y gancho',
+            fecha: '30 OCT 2026',
+            orden: 'OS-017',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Lubricación de cable y prueba de interruptores de fin de carrera.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-010',
+        nombre: 'Inyectora de Plástico 150T',
+        categoria: 'Transformación plásticos',
+        serie: 'IP-2023-550',
+        ubicacion: 'Planta C',
+        area: 'Moldeo',
+        ultimoServicio: '08 nov. 2026',
+        proximaFecha: '08 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Engel',
+        modelo: 'Victory 150',
+        anio: 2023,
+        potencia: '30 kW',
+        responsable: 'Laura Gómez',
+        imagen: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Calibración de resistencias de cañón',
+            fecha: '08 NOV 2026',
+            orden: 'OS-027',
+            responsable: 'Laura Gómez',
+            descripcion: 'Limpieza de husillo y control de temperatura por zonas.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-011',
+        nombre: 'Bomba Centrífuga de Enfriamiento',
+        categoria: 'Fluidos y enfriamiento',
+        serie: 'BC-2020-008',
+        ubicacion: 'Planta B',
+        area: 'Torre Enfriamiento',
+        ultimoServicio: '05 nov. 2026',
+        proximaFecha: '05 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Grundfos',
+        modelo: 'NB 50-200',
+        anio: 2020,
+        potencia: '15 kW',
+        responsable: 'Carlos Méndez',
+        imagen: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Revisión de sello mecánico',
+            fecha: '05 NOV 2026',
+            orden: 'OS-028',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Engrase de rodamientos y prueba de caudal a presión nominal.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-012',
+        nombre: 'Cortadora Láser Fibra Óptica',
+        categoria: 'Corte de alta precisión',
+        serie: 'CL-2022-901',
+        ubicacion: 'Planta A',
+        area: 'Corte Especial',
+        ultimoServicio: '14 nov. 2026',
+        proximaFecha: '14 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Bodor',
+        modelo: 'C3 3kW',
+        anio: 2022,
+        potencia: '20 kW',
+        responsable: 'Laura Gómez',
+        imagen: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Calibración óptica y cambio de boquillas',
+            fecha: '14 NOV 2026',
+            orden: 'OS-029',
+            responsable: 'Laura Gómez',
+            descripcion: 'Inspección de lente de enfoque y alineación del haz rojo guía.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-013',
+        nombre: 'Torno Convencional Paralelo',
+        categoria: 'Mecanizado general',
+        serie: 'TC-2015-300',
+        ubicacion: 'Taller Central',
+        area: 'Mantenimiento Mecánico',
+        ultimoServicio: '11 nov. 2026',
+        proximaFecha: '11 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Pinacho',
+        modelo: 'SC 200',
+        anio: 2015,
+        potencia: '4 kW',
+        responsable: 'Carlos Méndez',
+        imagen: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Alineación de contrapunto',
+            fecha: '11 NOV 2026',
+            orden: 'OS-030',
+            responsable: 'Carlos Méndez',
+            descripcion: 'Cambio de correa de transmisión y ajuste de plato de 3 mordazas.',
+            estado: 'Completado'
+          }
+        ]
+      },
+      {
+        id: 'EQ-014',
+        nombre: 'Envasadora Automática Vertical',
+        categoria: 'Empaque y sellado',
+        serie: 'ENV-2021-410',
+        ubicacion: 'Planta C',
+        area: 'Empaque',
+        ultimoServicio: '07 nov. 2026',
+        proximaFecha: '07 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: 30,
+        fabricante: 'Syntegon',
+        modelo: 'SVE 2520',
+        anio: 2021,
+        potencia: '6 kW',
+        responsable: 'Andrés Morales',
+        imagen: 'https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Revisión de mordazas de sellado térmico',
+            fecha: '07 NOV 2026',
+            orden: 'OS-031',
+            responsable: 'Andrés Morales',
+            descripcion: 'Ajuste de fotoceldas de registro y corte de bobina.',
+            estado: 'Completado'
+          }
+        ]
+      }
+    ];
+
+    // ---------------------------------------------------------------------------
+    // 2. ESTADO GLOBAL DE LA APLICACIÓN (Persistencia en localStorage)
+    // ---------------------------------------------------------------------------
+    let equipos = [];
+    let currentFilter = 'todos'; // 'todos', 'al_dia', 'proximos', 'vencidos'
+    let currentSearch = '';
+    let currentSort = 'proxima_fecha';
+    let currentPage = 1;
+    let itemsPerPage = 3; // En mockup muestra 3 equipos inicialmente
+    let showAllItems = false;
+    let selectedEquipoId = null;
+
+    function initData() {
+      try {
+        const stored = localStorage.getItem('manteniapp_demo_equipos');
+        if (stored) {
+          equipos = JSON.parse(stored);
+        } else {
+          equipos = JSON.parse(JSON.stringify(DEFAULT_EQUIPOS));
+          saveData();
+        }
+      } catch (e) {
+        equipos = JSON.parse(JSON.stringify(DEFAULT_EQUIPOS));
+      }
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem('manteniapp_demo_equipos', JSON.stringify(equipos));
+      } catch (e) {
+        console.warn('LocalStorage no disponible');
+      }
+    }
+
+    function resetDemoData() {
+      if (confirm('¿Deseas restablecer todos los equipos y contadores al estado inicial de la demo?')) {
+        equipos = JSON.parse(JSON.stringify(DEFAULT_EQUIPOS));
+        saveData();
+        renderAll();
+        showDemoToast('Datos de demostración restablecidos con éxito.', 'info');
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // 3. RENDERIZADO DE KPIS Y CONTADORES DINÁMICOS
+    // ---------------------------------------------------------------------------
+    function updateKPIs() {
+      const total = equipos.length;
+      const alDia = equipos.filter(e => e.estado === 'al_dia').length;
+      const proximos = equipos.filter(e => e.estado === 'proximos').length;
+      const vencidos = equipos.filter(e => e.estado === 'vencidos').length;
+
+      // KPI Cards
+      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-al-dia').textContent = alDia;
+      document.getElementById('kpi-proximos').textContent = proximos;
+      document.getElementById('kpi-vencidos').textContent = vencidos;
+
+      // Filter Tabs Counters
+      document.getElementById('tab-count-todos').textContent = total;
+      document.getElementById('tab-count-al_dia').textContent = alDia;
+      document.getElementById('tab-count-proximos').textContent = proximos;
+      document.getElementById('tab-count-vencidos').textContent = vencidos;
+
+      // Bell notification badge
+      const totalAlertas = proximos + vencidos;
+      const bellBadge = document.getElementById('bell-badge');
+      const sidebarBadge = document.getElementById('sidebar-alert-badge');
+      const alertsCountBadge = document.getElementById('alerts-count-badge');
+
+      if (totalAlertas > 0) {
+        bellBadge.textContent = totalAlertas;
+        bellBadge.classList.remove('hidden');
+        sidebarBadge.textContent = totalAlertas;
+        alertsCountBadge.textContent = `${totalAlertas} pendientes`;
+      } else {
+        bellBadge.classList.add('hidden');
+        sidebarBadge.textContent = '0';
+        alertsCountBadge.textContent = 'Sin alertas pendientes';
+      }
+
+      // Update bottom insight cards dynamically
+      updateInsightCards();
+    }
+
+    function updateInsightCards() {
+      const vencido = equipos.find(e => e.estado === 'vencidos');
+      const proximo = equipos.find(e => e.estado === 'proximos');
+
+      const urgentDesc = document.getElementById('urgent-card-desc');
+      const urgentBadge = document.getElementById('urgent-card-badge');
+      if (vencido) {
+        urgentDesc.textContent = `La ${vencido.nombre} tiene un mantenimiento vencido.`;
+        urgentBadge.textContent = `Vencido (${vencido.proximaFecha})`;
+      } else {
+        urgentDesc.textContent = '¡Excelente! No tienes ningún equipo con mantenimiento vencido.';
+        urgentBadge.textContent = 'Al día';
+        urgentBadge.className = 'px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700';
+      }
+
+      const upcomingDesc = document.getElementById('upcoming-card-desc');
+      const upcomingDate = document.getElementById('upcoming-card-date');
+      const upcomingBadge = document.getElementById('upcoming-card-badge');
+      if (proximo) {
+        upcomingDesc.textContent = `${proximo.nombre} · Mantenimiento preventivo`;
+        upcomingDate.textContent = proximo.proximaFecha.toUpperCase();
+        upcomingBadge.textContent = 'Próximo a vencer';
+      } else {
+        upcomingDesc.textContent = 'No hay mantenimientos programados para los próximos días.';
+        upcomingDate.textContent = 'PROGRAMADO';
+        upcomingBadge.textContent = 'Todo en orden';
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // 4. FILTRADO, BÚSQUEDA Y RENDERIZADO DE LA TABLA
+    // ---------------------------------------------------------------------------
+    function getFilteredEquipos() {
+      let result = equipos.filter(e => {
+        // Filtro por tab
+        if (currentFilter === 'al_dia' && e.estado !== 'al_dia') return false;
+        if (currentFilter === 'proximos' && e.estado !== 'proximos') return false;
+        if (currentFilter === 'vencidos' && e.estado !== 'vencidos') return false;
+
+        // Búsqueda en tiempo real
+        if (currentSearch) {
+          const q = currentSearch.toLowerCase();
+          const matchNombre = e.nombre.toLowerCase().includes(q);
+          const matchCodigo = e.id.toLowerCase().includes(q);
+          const matchSerie = e.serie.toLowerCase().includes(q);
+          const matchUbicacion = e.ubicacion.toLowerCase().includes(q);
+          const matchCategoria = e.categoria.toLowerCase().includes(q);
+          if (!matchNombre && !matchCodigo && !matchSerie && !matchUbicacion && !matchCategoria) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      // Ordenamiento
+      result.sort((a, b) => {
+        if (currentSort === 'nombre') return a.nombre.localeCompare(b.nombre);
+        if (currentSort === 'codigo') return a.id.localeCompare(b.id);
+        if (currentSort === 'estado') {
+          const weights = { vencidos: 1, proximos: 2, al_dia: 3 };
+          return (weights[a.estado] || 4) - (weights[b.estado] || 4);
+        }
+        // default: proxima_fecha (id/fecha aproximada)
+        return a.id.localeCompare(b.id);
+      });
+
+      return result;
+    }
+
+    function renderTable() {
+      const filtered = getFilteredEquipos();
+      const tbody = document.getElementById('equipment-table-body');
+      const emptyState = document.getElementById('table-empty-state');
+      const counterEl = document.getElementById('table-showing-counter');
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        counterEl.textContent = `Mostrando 0 de ${equipos.length} equipos · Datos de demostración`;
+        renderPagination(0, 1);
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      // Paginación
+      const effectiveItemsPerPage = showAllItems ? filtered.length : itemsPerPage;
+      const totalPages = Math.ceil(filtered.length / effectiveItemsPerPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * effectiveItemsPerPage;
+      const paginatedItems = filtered.slice(startIndex, startIndex + effectiveItemsPerPage);
+
+      counterEl.textContent = `Mostrando ${paginatedItems.length} de ${equipos.length} equipos · Datos de demostración`;
+
+      tbody.innerHTML = paginatedItems.map(item => {
+        // Badges por estado
+        let badgeHtml = '';
+        let dateColor = 'text-slate-600';
+
+        if (item.estado === 'al_dia') {
+          badgeHtml = `
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Al día
+            </span>`;
+        } else if (item.estado === 'proximos') {
+          badgeHtml = `
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-700">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Próximo
+            </span>`;
+        } else {
+          dateColor = 'text-rose-600 font-bold';
+          badgeHtml = `
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-50 text-rose-700">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Vencido
+            </span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors group">
+            
+            <!-- Equipo (Nombre + Categoría + Icono) -->
+            <td class="py-3.5 px-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center shrink-0 border border-slate-200/60 group-hover:border-slate-300">
+                  <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-bold text-slate-900 leading-tight">${escapeHtml(item.nombre)}</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(item.categoria)}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Código / Serie -->
+            <td class="py-3.5 px-3">
+              <div class="font-semibold text-slate-800">${escapeHtml(item.id)}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(item.serie)}</div>
+            </td>
+
+            <!-- Ubicación -->
+            <td class="py-3.5 px-3">
+              <div class="font-medium text-slate-800">${escapeHtml(item.ubicacion)}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(item.area || '')}</div>
+            </td>
+
+            <!-- Último servicio -->
+            <td class="py-3.5 px-3 text-slate-600 font-medium">
+              ${escapeHtml(item.ultimoServicio)}
+            </td>
+
+            <!-- Próxima fecha -->
+            <td class="py-3.5 px-3 ${dateColor}">
+              ${escapeHtml(item.proximaFecha)}
+            </td>
+
+            <!-- Estado Badge -->
+            <td class="py-3.5 px-3">
+              ${badgeHtml}
+            </td>
+
+            <!-- Acciones: Ver Hoja de Vida -->
+            <td class="py-3.5 px-3 text-right">
+              <button onclick="openHojaVidaModal('${item.id}')"
+                      class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:text-brand-emerald hover:border-brand-emerald/40 hover:bg-emerald-50/40 transition shadow-2xs">
+                <span>Ver Hoja de Vida</span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </td>
+
+          </tr>
+        `;
+      }).join('');
+
+      renderPagination(filtered.length, totalPages);
+    }
+
+    function renderPagination(totalItems, totalPages) {
+      const container = document.getElementById('pagination-pages');
+      const prevBtn = document.getElementById('btn-prev-page');
+      const nextBtn = document.getElementById('btn-next-page');
+
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+
+      let html = '';
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+          html += `<button class="w-7 h-7 rounded text-xs font-bold bg-brand-navy text-white shadow-2xs">${i}</button>`;
+        } else {
+          html += `<button onclick="goToPage(${i})" class="w-7 h-7 rounded text-xs font-medium text-slate-600 hover:bg-slate-100 border border-slate-200">${i}</button>`;
+        }
+      }
+      container.innerHTML = html;
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderTable();
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      renderTable();
+    }
+
+    function setFilter(filterType) {
+      currentFilter = filterType;
+      currentPage = 1;
+
+      // Update Tab styling
+      const tabs = ['todos', 'al_dia', 'proximos', 'vencidos'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`filter-btn-${t}`);
+        if (t === filterType) {
+          btn.className = 'filter-tab px-3 py-1.5 rounded-lg transition-all bg-brand-navy text-white shadow-2xs';
+        } else {
+          btn.className = 'filter-tab px-3 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900';
+        }
+      });
+
+      renderTable();
+    }
+
+    function handleSortChange(sortValue) {
+      currentSort = sortValue;
+      renderTable();
+    }
+
+    function toggleShowAllEquipments() {
+      showAllItems = !showAllItems;
+      const btn = document.getElementById('btn-toggle-view');
+      if (showAllItems) {
+        btn.textContent = 'Ver en páginas (3)';
+      } else {
+        btn.textContent = 'Ver todos los equipos';
+      }
+      currentPage = 1;
+      renderTable();
+    }
+
+    function resetFiltersAndSearch() {
+      currentFilter = 'todos';
+      currentSearch = '';
+      document.getElementById('global-search-input').value = '';
+      setFilter('todos');
+    }
+
+    // ---------------------------------------------------------------------------
+    // 5. MODAL: HOJA DE VIDA / DETALLES DEL EQUIPO
+    // ---------------------------------------------------------------------------
+    function openHojaVidaModal(equipoId) {
+      const item = equipos.find(e => e.id === equipoId);
+      if (!item) return;
+
+      selectedEquipoId = equipoId;
+
+      document.getElementById('modal-equipo-nombre').textContent = item.nombre;
+      document.getElementById('modal-equipo-serie').textContent = `${item.id} / Serie ${item.serie}`;
+      document.getElementById('modal-equipo-img').src = item.imagen || DEFAULT_EQUIPOS[0].imagen;
+
+      // Plan preventivo
+      document.getElementById('modal-plan-ultimo').textContent = item.ultimoServicio;
+      document.getElementById('modal-plan-proximo').textContent = item.proximaFecha;
+      document.getElementById('modal-plan-frecuencia').textContent = `Frecuencia ${item.frecuenciaDias} días`;
+
+      // Status Badge
+      const badge = document.getElementById('modal-equipo-badge');
+      const completeBtn = document.getElementById('btn-completar-mantenimiento');
+
+      if (item.estado === 'al_dia') {
+        badge.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200';
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Al día`;
+        completeBtn.textContent = 'Marcar servicio preventivo adicional';
+      } else if (item.estado === 'proximos') {
+        badge.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200';
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Próximo a vencer`;
+        completeBtn.textContent = 'Completar Mantenimiento';
+      } else {
+        badge.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200';
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Vencido`;
+        completeBtn.textContent = 'Completar Mantenimiento';
+      }
+
+      // Especificaciones Técnicas
+      document.getElementById('modal-spec-fabricante').textContent = item.fabricante || 'Haas Automation';
+      document.getElementById('modal-spec-modelo').textContent = item.modelo || 'VF-2';
+      document.getElementById('modal-spec-anio').textContent = item.anio || '2021';
+      document.getElementById('modal-spec-potencia').textContent = item.potencia || '22,4 kW';
+      document.getElementById('modal-spec-ubicacion').textContent = `${item.ubicacion} · ${item.area || 'Operaciones'}`;
+      document.getElementById('modal-spec-responsable').textContent = item.responsable || 'Carlos Méndez';
+
+      // Historial
+      const historial = item.historial || [];
+      document.getElementById('modal-historial-count').textContent = `${historial.length} registros`;
+
+      const listContainer = document.getElementById('modal-historial-list');
+      if (historial.length === 0) {
+        listContainer.innerHTML = '<p class="text-xs text-slate-400 py-3 text-center">Sin intervenciones previas registradas.</p>';
+      } else {
+        listContainer.innerHTML = historial.map(h => `
+          <div class="border border-slate-100 rounded-xl p-3 bg-white hover:border-slate-200 transition">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold">✓</span>
+                <span class="font-bold text-slate-900">${escapeHtml(h.titulo)}</span>
+              </div>
+              <span class="text-[10px] font-bold text-slate-400 font-mono">${escapeHtml(h.fecha)}</span>
+            </div>
+            <p class="text-[11px] text-slate-600 mt-1 pl-6">${escapeHtml(h.descripcion)}</p>
+            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50 pl-6 text-[10px] text-slate-400">
+              <span>${escapeHtml(h.orden || 'OS-GEN')} · ${escapeHtml(h.responsable || 'Técnico')}</span>
+              <span class="text-emerald-700 font-semibold">${escapeHtml(h.estado || 'Completado')}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('modal-footer-updated').textContent = `Actualizado el ${item.ultimoServicio} · Datos de demostración`;
+
+      // Mostrar modal
+      document.getElementById('modal-hoja-vida').classList.remove('hidden');
+    }
+
+    function closeHojaVidaModal() {
+      document.getElementById('modal-hoja-vida').classList.add('hidden');
+      selectedEquipoId = null;
+    }
+
+    // Acción interactiva: Marcar mantenimiento como realizado
+    function completarMantenimientoModal() {
+      if (!selectedEquipoId) return;
+
+      const item = equipos.find(e => e.id === selectedEquipoId);
+      if (!item) return;
+
+      const hoyStr = '26 nov. 2026';
+      const proximaStr = '26 dic. 2026';
+
+      item.ultimoServicio = hoyStr;
+      item.proximaFecha = proximaStr;
+      item.estado = 'al_dia';
+
+      // Agregar al historial de este equipo
+      if (!item.historial) item.historial = [];
+      const newOrderNum = `OS-0${Math.floor(Math.random() * 80) + 30}`;
+
+      item.historial.unshift({
+        titulo: 'Mantenimiento preventivo periódico',
+        fecha: '26 NOV 2026',
+        orden: newOrderNum,
+        responsable: item.responsable || 'Carlos Méndez',
+        descripcion: 'Inspección integral, lubricación general y verificación operativa de rutina.',
+        estado: 'Completado'
+      });
+
+      saveData();
+      updateKPIs();
+      renderTable();
+
+      // Refrescar modal abierto
+      openHojaVidaModal(selectedEquipoId);
+
+      showDemoToast(`¡Mantenimiento registrado para ${item.nombre}! Estado actualizado a "Al día".`, 'success');
+    }
+
+    // ---------------------------------------------------------------------------
+    // 6. MODAL: REGISTRAR NUEVO EQUIPO
+    // ---------------------------------------------------------------------------
+    function openNewEquipmentModal() {
+      document.getElementById('modal-nuevo-equipo').classList.remove('hidden');
+      document.getElementById('new-nombre').focus();
+    }
+
+    function closeNewEquipmentModal() {
+      document.getElementById('modal-nuevo-equipo').classList.add('hidden');
+      document.getElementById('form-nuevo-equipo').reset();
+    }
+
+    function handleNewEquipmentSubmit(event) {
+      event.preventDefault();
+
+      const nombre = document.getElementById('new-nombre').value.trim();
+      const codigo = document.getElementById('new-codigo').value.trim();
+      const serie = document.getElementById('new-serie').value.trim() || `SN-${Date.now().toString().slice(-6)}`;
+      const ubicacion = document.getElementById('new-ubicacion').value.trim();
+      const frecuencia = parseInt(document.getElementById('new-frecuencia').value, 10) || 30;
+      const categoria = document.getElementById('new-categoria').value.trim() || 'Maquinaria general';
+      const responsable = document.getElementById('new-responsable').value.trim() || 'Carlos Méndez';
+
+      const nuevoEquipo = {
+        id: codigo,
+        nombre: nombre,
+        categoria: categoria,
+        serie: serie,
+        ubicacion: ubicacion,
+        area: 'Producción',
+        ultimoServicio: '26 nov. 2026',
+        proximaFecha: '26 dic. 2026',
+        estado: 'al_dia',
+        frecuenciaDias: frecuencia,
+        fabricante: 'Genérico Industrial',
+        modelo: 'Serie 2026',
+        anio: 2026,
+        potencia: '15 kW',
+        responsable: responsable,
+        imagen: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=800&auto=format&fit=crop',
+        historial: [
+          {
+            titulo: 'Puesta en marcha e inspección inicial',
+            fecha: '26 NOV 2026',
+            orden: 'OS-001',
+            responsable: responsable,
+            descripcion: 'Registro inicial de activo, prueba en vacío y habilitación de hoja de vida.',
+            estado: 'Completado'
+          }
+        ]
+      };
+
+      equipos.unshift(nuevoEquipo);
+      saveData();
+
+      closeNewEquipmentModal();
+      updateKPIs();
+      setFilter('todos');
+      renderTable();
+
+      showDemoToast(`¡Equipo "${nombre}" (${codigo}) registrado exitosamente!`, 'success');
+    }
+
+    // ---------------------------------------------------------------------------
+    // 7. DROPDOWN DE ALERTAS / NOTIFICACIONES
+    // ---------------------------------------------------------------------------
+    function toggleAlertsDropdown() {
+      const dropdown = document.getElementById('alerts-dropdown');
+      const isHidden = dropdown.classList.contains('hidden');
+
+      if (isHidden) {
+        populateAlertsDropdown();
+        dropdown.classList.remove('hidden');
+      } else {
+        dropdown.classList.add('hidden');
+      }
+    }
+
+    function populateAlertsDropdown() {
+      const listContainer = document.getElementById('alerts-list');
+      const urgentItems = equipos.filter(e => e.estado === 'vencidos' || e.estado === 'proximos');
+
+      if (urgentItems.length === 0) {
+        listContainer.innerHTML = `
+          <div class="p-6 text-center text-slate-400">
+            <svg class="w-8 h-8 text-emerald-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="font-bold text-slate-700">¡Al día!</p>
+            <p class="text-slate-400 text-[11px]">No hay mantenimientos urgentes ni vencidos.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = urgentItems.map(item => {
+        const isVencido = item.estado === 'vencidos';
+        const badgeColor = isVencido ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200';
+        const tagText = isVencido ? 'Vencido' : 'Próximo';
+
+        return `
+          <div onclick="openHojaVidaModal('${item.id}'); toggleAlertsDropdown();"
+               class="p-3 hover:bg-slate-50 transition cursor-pointer flex items-start gap-2.5">
+            <span class="w-2 h-2 rounded-full mt-1.5 shrink-0 ${isVencido ? 'bg-rose-500' : 'bg-amber-500'}"></span>
+            <div class="flex-1 overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-900 truncate">${escapeHtml(item.nombre)}</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${tagText}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 mt-0.5 truncate">${escapeHtml(item.id)} · ${escapeHtml(item.ubicacion)}</div>
+              <div class="text-[10px] text-slate-400 mt-1">Fecha límite: <strong>${escapeHtml(item.proximaFecha)}</strong></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openUrgentEquipment() {
+      const vencido = equipos.find(e => e.estado === 'vencidos') || equipos[0];
+      if (vencido) openHojaVidaModal(vencido.id);
+    }
+
+    function openUpcomingEquipment() {
+      const proximo = equipos.find(e => e.estado === 'proximos') || equipos[0];
+      if (proximo) openHojaVidaModal(proximo.id);
+    }
+
+    function scrollToEquipmentTable() {
+      const el = document.getElementById('tabla-equipos-container');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ---------------------------------------------------------------------------
+    // 8. TOAST NOTIFICATIONS HELPER
+    // ---------------------------------------------------------------------------
+    function showDemoToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const bg = type === 'success' ? 'bg-emerald-800 text-white' : type === 'error' ? 'bg-rose-800 text-white' : 'bg-slate-900 text-white';
+
+      toast.className = `${bg} px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2 pointer-events-auto transition-all transform translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <svg class="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>${escapeHtml(message)}</span>
+      `;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      }, 4000);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 9. EVENT LISTENERS GLOBALES
+    // ---------------------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      initData();
+      renderAll();
+
+      // Búsqueda en tiempo real
+      const searchInput = document.getElementById('global-search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          currentSearch = e.target.value.trim();
+          currentPage = 1;
+          renderTable();
+        });
+      }
+
+      // Atajo de teclado ⌘K / Ctrl+K
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          if (searchInput) searchInput.focus();
+        }
+        if (e.key === 'Escape') {
+          closeHojaVidaModal();
+          closeNewEquipmentModal();
+          const dropdown = document.getElementById('alerts-dropdown');
+          if (dropdown) dropdown.classList.add('hidden');
+        }
+      });
+
+      // Menú móvil
+      const openBtn = document.getElementById('open-sidebar-btn');
+      const closeBtn = document.getElementById('close-sidebar-btn');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+
+      function openSidebar() {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+
+      if (openBtn) openBtn.addEventListener('click', openSidebar);
+      if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+      if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+      // Cerrar dropdown al hacer clic afuera
+      document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('alerts-dropdown');
+        const bellBtn = document.getElementById('bell-btn');
+        if (dropdown && !dropdown.contains(e.target) && !bellBtn.contains(e.target)) {
+          dropdown.classList.add('hidden');
+        }
+      });
+    });
+
+    function renderAll() {
+      updateKPIs();
+      renderTable();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+
+</body>
+</html>
