@@ -44,10 +44,28 @@ Abre en tu navegador:
 
 ---
 
+## 🚀 Módulos del Proyecto
+
+1. **Landing Page (`index.html`):**
+   - Página principal de presentación comercial, réplica exacta del mockup de Figma.
+   - Formulario de contacto con envío automático de correo vía SMTP (Nodemailer).
+
+2. **Aplicación Web Demo Interactiva (`demo.html`):**
+   - Panel de control operativo completo y 100% interactivo, basado en `mockup-Panel-de-control.png` y `mockup-Hoja-de-vida-abierta.png`.
+   - **Cero backend:** Funciona totalmente en el navegador con datos en memoria y persistencia automática en `localStorage`.
+   - **Resumen de KPIs dinámico:** Contadores de Total, Al día, Próximos y Vencidos calculados en tiempo real.
+   - **Filtros y Búsqueda en tiempo real:** Búsqueda instantánea con atajo `⌘K` / `Ctrl+K`, filtros segmentados (*Todos*, *Al día*, *Próximos*, *Vencidos*) y ordenamiento dinámico.
+   - **Modal "Hoja de Vida / Detalle":** Inspección visual con fotos de maquinaria, especificaciones técnicas completas, historial de órdenes de servicio y botón funcional **"Completar Mantenimiento"** que actualiza el estado a *"Al día"*, añade un registro al historial y recalcula los contadores.
+   - **Modal "Registrar Nuevo Equipo":** Permite agregar nuevos activos al inventario con actualización inmediata de la tabla y los KPIs.
+   - **Campana de Alertas:** Dropdown interactivo con accesos directos a equipos urgentes o con mantenimiento próximo.
+   - **Restablecer Demo:** Botón de reinicio para volver a los datos originales en cualquier momento.
+
+---
+
 ## 📬 Flujo de Envío de la Demo por Correo
 
 1. El usuario completa sus datos (Nombre, Empresa, Correo, Teléfono) y presiona **"Quiero mi Demo"**.
 2. El backend procesa la petición y envía un correo interactivo directamente al **correo del usuario**.
-3. El correo recibido contiene una plantilla diseñada para **ManteniApp**, con un botón principal que redirige a la aplicación en vivo desplegada en Vercel:
-   👉 **https://manteniapp.vercel.app/**
+3. El correo contiene una plantilla corporativa con un botón directo hacia la demo:
+   👉 **`https://manteniapp.vercel.app/demo.html`**
 4. Se envía una copia oculta (BCC) a `entregaservicio53@gmail.com` para registro del proyecto.

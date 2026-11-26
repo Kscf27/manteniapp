@@ -60,8 +60,8 @@ app.post('/api/solicitar-demo', async (req, res) => {
 
     const transporter = createTransporter();
 
-    // Enlace de la demo interactiva en Vercel
-    const demoUrl = 'https://manteniapp.vercel.app/';
+    // Enlace directo a la aplicación DEMO interactiva en Vercel
+    const demoUrl = 'https://manteniapp.vercel.app/demo.html';
 
     // Contenido del correo que se envía al usuario solicitante
     const mailOptions = {
@@ -208,6 +208,11 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     smtp_configured: Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS)
   });
+});
+
+// Ruta directa a la aplicación demo interactiva
+app.get('/demo', (req, res) => {
+  res.sendFile(path.join(__dirname, 'demo.html'));
 });
 
 // Servir index.html para cualquier otra ruta
